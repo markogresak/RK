@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<transakcija odgovor="true" tip="izdaja">
+    <stranka>Rdeča kapica</stranka>
+    <odgovor>izdaja stranke Rdeča kapica: Artikel [ID=2]: Rdeče ogrinjalo, 4 kosi v skladišču 2</odgovor>
+    <artikel id="2">
+        <naziv>Rdeče ogrinjalo</naziv>
+        <kolicina>4</kolicina>
+        <skladisce>2</skladisce>
+    </artikel>
+</transakcija>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<transakcija tip="inventura">
+	<stranka>Volk</stranka>
+	<artikel id="1">
+		<naziv>Košara s sadjem</naziv>
+		<kolicina>1</kolicina>
+		<skladisce>5</skladisce>
+	</artikel>
+	<artikel id="2">
+		<naziv>Rdeče ogrinjalo</naziv>
+		<kolicina>2</kolicina>
+		<skladisce>4</skladisce>
+	</artikel>
+	<artikel id="3">
+		<naziv>Rdeče ogrinjalo</naziv>
+		<kolicina>3</kolicina>
+		<skladisce>3</skladisce>
+	</artikel>
+	<artikel id="4">
+		<naziv>Rdeče ogrinjalo</naziv>
+		<kolicina>4</kolicina>
+		<skladisce>2</skladisce>
+	</artikel>
+	<artikel id="5">
+		<naziv>Rdeče ogrinjalo</naziv>
+		<kolicina>5</kolicina>
+		<skladisce>1</skladisce>
+	</artikel>
+</transakcija>
