@@ -1,3 +1,4 @@
+package transakcija;
 public enum TipTransakcije {
 
 	Dobava("dobava", 0), Izdaja("izdaja", 1), Inventura("inventura", 2);

@@ -1,4 +1,6 @@
+package transakcija;
 import java.io.File;
+import java.io.StringReader;
 import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -11,6 +13,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 public class XMLHelper {
 	public static String serializeDocumentToString(Document doc, boolean formatted) {
@@ -34,7 +37,7 @@ public class XMLHelper {
 	
 	/**
 	 * Ustvari prazen DOM Document z novo instanco DocumentBuilderFactory
-	 * @return - nov Document oziroma null, če ne prišlo do napake
+	 * @return - nov Document oziroma null, če je prišlo do napake
 	 */
 	public static Document newEmptyDocument() {
 		Document doc = null;
@@ -47,12 +50,26 @@ public class XMLHelper {
 
 	/**
 	 * Ustvari DOM Document in parsaj podano datoteko
-	 * @return - nov Document oziroma null, če ne prišlo do napake
+	 * @return - nov Document oziroma null, če je prišlo do napake
 	 */	
 	public static Document newParsedDocument(File xmlFile){
 		Document doc = null;
 		try {
 			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(xmlFile);
+		} catch (Exception e) {
+		}
+		return doc;
+	}
+	
+	/**
+	 * Ustvari DOM Document in parsaj podan input stream
+	 * @return - nov Document oziroma null, če je prišlo do napake
+	 */	
+	public static Document newParsedDocument(String xmlString) {
+		Document doc = null;
+		try {
+			doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+					new InputSource(new StringReader(xmlString)));
 		} catch (Exception e) {
 		}
 		return doc;

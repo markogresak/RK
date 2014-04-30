@@ -1,4 +1,6 @@
+package transakcija;
 import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,7 +22,7 @@ public class Transakcija {
 	/**
 	 * Konstruktor, ki objekt inicializira s podanimi podatki
 	 * @param tip - tip transakcije
-	 * @param stranka - ime stranke, na katero se nanaša transakcija
+	 * @param stranka - ime stranke, na katero se nanasa transakcija
 	 * @param artikli - artikli, ki so obravnavani v transakciji
 	 */
 	public Transakcija(TipTransakcije tip, String stranka, Artikel[] artikli) {
@@ -37,31 +39,29 @@ public class Transakcija {
 	 */
 	public Transakcija(File datoteka){
 		
-		// Če datoteka ne obstaja, obvesti o napaki
+		// ce datoteka ne obstaja, obvesti o napaki
 		if (!datoteka.exists())
 			throw new InvalidParameterException("Datoteka " + datoteka.getAbsolutePath() + " ne obstaja!");
 			
 		// Odpri podan dokument in ga parsaj
-		Document doc = XMLHelper.newParsedDocument(datoteka);
+		parseDokument(XMLHelper.newParsedDocument(datoteka));
+	}
+	
+	/**
+	 * Konstruktor, ki objekt inicializira s podatki iz podanega input streama
+	 * @param xmlInput - xml input stream s podatki o transakciji
+	 */
+	public Transakcija(DataInputStream xmlInput){
 		
-		// Preberi vsebino atributa tip v tagu transakcija
-		TipTransakcije tip = TipTransakcije.getByName(doc.getElementsByTagName("transakcija").item(0).getAttributes().getNamedItem("tip").getTextContent());
-		
-		// Preberi vsebino elementa stranka
-		String stranka = doc.getElementsByTagName("stranka").item(0).getTextContent();
-		
-		// Preberi vsebino elementa odgovor
-		Node nOdgovor = doc.getElementsByTagName("odgovor").item(0); 
-		String odgovor =  nOdgovor != null ? nOdgovor.getTextContent() : "";
-		
-		// Poišči vse tage artikel in iz vsakega naredi objekt Artikel
-		NodeList artikliList = doc.getElementsByTagName("artikel");
-		Artikel[] artikli = new Artikel[artikliList.getLength()];
-		for(int i=0;i<artikliList.getLength();i++)
-			artikli[i] = new Artikel(artikliList.item(i));
-		
-		// Z zbranimi podatki iniclializiraj trenutno instanco Transakcija
-		init(tip, stranka, artikli, odgovor);
+		// ce datoteka ne obstaja, obvesti o napaki
+		if (xmlInput == null)
+			throw new InvalidParameterException("XML input stream je null");
+			
+		// Odpri podan dokument in ga parsaj
+		try {
+			parseDokument(XMLHelper.newParsedDocument(xmlInput.readUTF()));
+		} catch (IOException e) {
+		}
 	}
 	
 	/**
@@ -72,18 +72,39 @@ public class Transakcija {
 		this(new File(pot));
 	}
 	
+	private void parseDokument(Document doc) {
+		// Preberi vsebino atributa tip v tagu transakcija
+		TipTransakcije tip = TipTransakcije.getByName(doc.getElementsByTagName("transakcija").item(0).getAttributes().getNamedItem("tip").getTextContent());
+		
+		// Preberi vsebino elementa stranka
+		String stranka = doc.getElementsByTagName("stranka").item(0).getTextContent();
+		
+		// Preberi vsebino elementa odgovor
+		Node nOdgovor = doc.getElementsByTagName("odgovor").item(0); 
+		String odgovor =  nOdgovor != null ? nOdgovor.getTextContent() : "";
+		
+		// Poisci vse tage artikel in iz vsakega naredi objekt Artikel
+		NodeList artikliList = doc.getElementsByTagName("artikel");
+		Artikel[] artikli = new Artikel[artikliList.getLength()];
+		for(int i=0;i<artikliList.getLength();i++)
+			artikli[i] = new Artikel(artikliList.item(i));
+		
+		// Z zbranimi podatki iniclializiraj trenutno instanco Transakcija
+		init(tip, stranka, artikli, odgovor);
+	}
+	
 	private void init(TipTransakcije tip, String stranka, Artikel[] artikli, String odgovor) {
-		// Če je tip transkacije null ali prazen String, sporoči napako
+		// Ce je tip transkacije null ali prazen String, sporoci napako
 		if(tip == null)
 			throw new InvalidParameterException("tip transakcije == null");
 		this._tip = tip;
 		
-		// Če je stranka null ali prazen String, sporoči napako
+		// Ce je stranka null ali prazen String, sporo??i napako
 		if(stranka == null || stranka.trim().equals(""))
 			throw new InvalidParameterException("stranka == null || \"\"");
 		this._stranka = stranka;
 		
-		// Če je tabela artikli null ali brez elementov, ali pa je kateri od
+		// Ce je tabela artikli null ali brez elementov, ali pa je kateri od
 		// elementov null, obvesti o napaki
 		if(artikli == null || artikli.length == 0)
 			throw new InvalidParameterException("artikli == null || artikli.length == 0");
