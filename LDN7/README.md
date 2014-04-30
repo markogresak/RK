@@ -1,4 +1,4 @@
-LDN2: Skladišče - kreiranje in razčlenjevanje XML sporočil
+LDN7: Programiranje vtičev (Java/Python, odjemalec-strežnik)
 --------
 
 Skladiščni program, ki zna brati in shranjevati XML datoteke ter generirati odgovore na 3 različne tipe datotek:
@@ -6,13 +6,19 @@ Skladiščni program, ki zna brati in shranjevati XML datoteke ter generirati od
 *   izdajnica *(Primer: datoteka xml/izdajnica.xml)*
 *   inventura *(Primer: datoteka xml/inventura.xml)*
 
-**Glavni program *(metoda main)* se nahaja v datoteki SkladiscniProgram.java**
+Dodana komunikacija med odjemalcem in strežnikom, komunikacija poteka preko XML sporočil, ki se populirajo s podatki, ki jih je vnesel uporabnik oziroma podatki, ki jih je generiral strežnik po obdelavi ukaza.
 
 ### Datoteke: ###
 
- * Artikel.java: razred v katerem shranim tage artikel
- * TipTransakcije.java: enum za tipe (namesto plain string)
- * Transakcija.java: shrani celotno transakcijo, iz parametrov ali datoteke
- * XMLHelper.java: razred s pomožnimi statičnimi metodami
- * SkladiscniProgram.java: glavni program (testi)
+ * transakcija/Artikel.java: razred v katerem shranim tage artikel
+ * transakcija/TipTransakcije.java: enum za tipe (namesto plain string)
+ * transakcija/Transakcija.java: hrani transakcijo, iz parametrov ali datoteke
+ * transakcija/XMLHelper.java: razred s pomožnimi statičnimi metodami
+
+### Odjemalec: ###
+ * odjemalec/Odjemalec.java: interakcija z uporabnikom, pošilja na strežnik
+
+### Strežnik: ###
+* streznik/Streznik.java: procesira zahteve odjemalca
+* streznik/StanjeSkladisca.java: shranjuje stanje zalog v skladiščih
 
