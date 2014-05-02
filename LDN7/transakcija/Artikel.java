@@ -166,4 +166,15 @@ public class Artikel {
 	public boolean equals(Object obj) {
 		return ((Artikel)obj).getNaziv().equals(this.getNaziv());
 	}
+	
+	private Artikel() {
+		_id = -1;
+		_naziv = null;
+		_kolicina = 0;
+		_skladisce = -1;
+	}
+	
+	public static Artikel empty() {
+		return new Artikel();
+	}
 }
