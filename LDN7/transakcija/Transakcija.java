@@ -168,8 +168,9 @@ public class Transakcija {
 		return _doc;
 	}
 	
-	private void setOdgovor(String odgovor) {
+	public Transakcija setOdgovor(String odgovor) {
 		this._odgovor = odgovor;
+		return this;
 	}
 	
 	public Transakcija generateOdgovor() {
