@@ -71,7 +71,7 @@ public class Streznik {
             // poslji sporocilo in zapri povezavo
             Transakcija odg = Skladisce.obdelajTransakcijo(t);
             String xmlOdg = odg.getXMLDocumentString();
-//            System.out.println("poslan xml\n"+xmlOdg);
+            System.out.println("poslan xml\n"+xmlOdg);
             out.writeUTF(xmlOdg);
         } catch (Exception e) {
             System.err.println("Napaka pri obdelavi transakcije");
