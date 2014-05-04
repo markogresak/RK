@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<transakcija tip="izdaja">
-	<stranka>Rdeča kapica</stranka>
-	<artikel>
-		<naziv>Rdeče ogrinjalo</naziv>
-		<kolicina>4</kolicina>
-		<skladisce>2</skladisce>
-	</artikel>
-</transakcija>
