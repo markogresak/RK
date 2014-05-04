@@ -1,31 +1,27 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<transakcija odgovor="true" tip="inventura">
+<?xml version="1.0" encoding="UTF-8" ?>
+<transakcija tip="inventura">
     <stranka>Volk</stranka>
-    <odgovor>inventura stranke Volk: Artikel [ID=3]: Košara s sadjem, 1 kosov v skladišču 5 ; Artikel [ID=4]: Rdeče
-        ogrinjalo, 2 kosa v skladišču 4 ; Artikel [ID=5]: Rdeče ogrinjalo, 3 kosov v skladišču 3 ; Artikel [ID=6]: Rdeče
-        ogrinjalo, 4 kosi v skladišču 2 ; Artikel [ID=7]: Rdeče ogrinjalo, 5 kosov v skladišču 1
-    </odgovor>
-    <artikel id="3">
+    <artikel id="1">
         <naziv>Košara s sadjem</naziv>
         <kolicina>1</kolicina>
         <skladisce>5</skladisce>
     </artikel>
-    <artikel id="4">
+    <artikel id="2">
         <naziv>Rdeče ogrinjalo</naziv>
         <kolicina>2</kolicina>
         <skladisce>4</skladisce>
     </artikel>
-    <artikel id="5">
+    <artikel id="3">
         <naziv>Rdeče ogrinjalo</naziv>
         <kolicina>3</kolicina>
         <skladisce>3</skladisce>
     </artikel>
-    <artikel id="6">
+    <artikel id="4">
         <naziv>Rdeče ogrinjalo</naziv>
         <kolicina>4</kolicina>
         <skladisce>2</skladisce>
     </artikel>
-    <artikel id="7">
+    <artikel id="5">
         <naziv>Rdeče ogrinjalo</naziv>
         <kolicina>5</kolicina>
         <skladisce>1</skladisce>
