@@ -21,4 +21,3 @@ Dodana komunikacija med odjemalcem in strežnikom, komunikacija poteka preko XML
 ### Strežnik: ###
 * streznik/Streznik.java: procesira zahteve odjemalca
 * streznik/StanjeSkladisca.java: shranjuje stanje zalog v skladiščih
-
