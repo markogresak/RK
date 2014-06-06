@@ -126,6 +126,9 @@ public class Streznik {
                 Socket socket = ss.accept();
                 ((SSLSocket) socket).startHandshake();
                 String user = ((SSLSocket) socket).getSession().getPeerPrincipal().getName();
+                int cnIndex = user.indexOf("CN=");
+                if (cnIndex > 0)
+                    user = user.substring(cnIndex + 3);
                 System.out.println("Zahteva uporabnika: " + user);
 
                 handleConnection(socket);
