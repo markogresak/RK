@@ -23,7 +23,6 @@ public class Odjemalec {
     private KeyStore serverKeyStore;
     private SSLContext sslContext;
 
-
     public Odjemalec(String host, int port, String ime, String geslo) {
         this.host = host;
         this.port = port;
@@ -56,9 +55,9 @@ public class Odjemalec {
                         char[] pwd = console.readPassword("Vnesite geslo: ");
                         geslo = new String(pwd).trim();
                     }
-                }
-                else
+                } else {
                     throw new NullPointerException("console");
+                }
             } catch (Exception ex) {
                 try {
                     if (ime == null || ime.isEmpty()) {
@@ -80,14 +79,12 @@ public class Odjemalec {
             new Odjemalec(host, port, ime, geslo).connect();
     }
 
-    private void setupServerKeystore() throws GeneralSecurityException,
-            IOException {
+    private void setupServerKeystore() throws GeneralSecurityException, IOException {
         serverKeyStore = KeyStore.getInstance("JKS");
         serverKeyStore.load(new FileInputStream("server.public"), "public".toCharArray());
     }
 
-    private void setupClientKeyStore() throws GeneralSecurityException,
-            IOException {
+    private void setupClientKeyStore() throws GeneralSecurityException, IOException {
         clientKeyStore = KeyStore.getInstance("JKS");
         clientKeyStore.load(new FileInputStream(ime + ".private"), geslo.toCharArray());
     }
