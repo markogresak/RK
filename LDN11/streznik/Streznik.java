@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
+import java.sql.Timestamp;
+import java.util.Date;
 
 public class Streznik {
 
@@ -123,15 +125,13 @@ public class Streznik {
 
 
             while (true) {
-                Socket socket = ss.accept();
-                ((SSLSocket) socket).startHandshake();
-                String user = ((SSLSocket) socket).getSession().getPeerPrincipal().getName();
-                int cnIndex = user.indexOf("CN=");
-                if (cnIndex > 0)
-                    user = user.substring(cnIndex + 3);
-                System.out.println("Zahteva uporabnika: " + user);
-
-                handleConnection(socket);
+                try {
+                    Socket socket = ss.accept();
+                    ((SSLSocket) socket).startHandshake();
+                    handleConnection(socket);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
         } catch (IOException ioe) {
@@ -151,10 +151,16 @@ public class Streznik {
 
     protected void handleConnection(Socket server) throws IOException {
         DataOutputStream out = new DataOutputStream(server.getOutputStream());
+        String user = ((SSLSocket) server).getSession().getPeerPrincipal().getName();
+        int cnIndex = user.indexOf("CN=");
+        if (cnIndex >= 0)
+            user = user.substring(cnIndex + 3);
+        System.out.printf("[ %s ] Nova zahteva uporabnika: %s \n", new Timestamp(new Date().getTime()), user);
 
         Transakcija t = null;
         try {
             t = new Transakcija(new DataInputStream(server.getInputStream()));
+            t.setStranka(user);
             System.out.println("Nova zahteva:");
             System.out.println(t.getXMLDocumentString());
             // poslji sporocilo in zapri povezavo
