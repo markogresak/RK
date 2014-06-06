@@ -49,7 +49,7 @@ public class Odjemalec {
                 console = System.console();
                 if (console != null) {
                     if (ime == null || ime.isEmpty()) {
-                        ime = console.readLine("Vnesite ime: ").trim();
+                        ime = console.readLine("Vnesite uporabnisko ime: ").trim();
                     }
                     if (geslo == null || geslo.isEmpty()) {
                         char[] pwd = console.readPassword("Vnesite geslo: ");
