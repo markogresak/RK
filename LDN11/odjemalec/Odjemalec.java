@@ -46,38 +46,42 @@ public class Odjemalec {
         if (args.length > 3)
             geslo = args[3];
 
-        if ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty()))
-            System.out.println("Namig: privzeti certifikat je rk.private, geslo je rkpwd1");
+        if ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty())) {
+            System.out.println("Namig: privzeti certifikat je ./certifikati/rk.private, geslo je rkpwd1");
+            System.out.println("       (za izbiro prizvetih nastavitev vnesite prazno pot in geslo)");
+        }
         Console console;
-        while ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty())) {
+        try {
+            console = System.console();
+            if (console != null) {
+                if (ime == null || ime.isEmpty()) {
+                    ime = console.readLine("Vnesite pot do certifikata: ").trim();
+                }
+                if (geslo == null || geslo.isEmpty()) {
+                    char[] pwd = console.readPassword("Vnesite geslo: ");
+                    geslo = new String(pwd).trim();
+                }
+            } else {
+                throw new NullPointerException("console");
+            }
+        } catch (Exception ex) {
             try {
-                console = System.console();
-                if (console != null) {
-                    if (ime == null || ime.isEmpty()) {
-                        ime = console.readLine("Vnesite ime certifikata: ").trim();
-                    }
-                    if (geslo == null || geslo.isEmpty()) {
-                        char[] pwd = console.readPassword("Vnesite geslo: ");
-                        geslo = new String(pwd).trim();
-                    }
-                } else {
-                    throw new NullPointerException("console");
+                if (ime == null || ime.isEmpty()) {
+                    System.out.print("Vnesite pot do certifikata: ");
+                    ime = reader.readLine().trim();
                 }
-            } catch (Exception ex) {
-                try {
-                    if (ime == null || ime.isEmpty()) {
-                        System.out.print("Vnesite ime certifikata: ");
-                        ime = reader.readLine().trim();
-                    }
-                    if (geslo == null || geslo.isEmpty()) {
-                        System.out.print("Vnesite geslo: ");
-                        geslo = reader.readLine().trim();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (geslo == null || geslo.isEmpty()) {
+                    System.out.print("Vnesite geslo: ");
+                    geslo = reader.readLine().trim();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        if ((ime == null || ime.isEmpty()))
+            ime = "./certifikati/rk.private";
+        if (geslo == null || geslo.isEmpty())
+            geslo = "rkpwd1";
         System.out.printf("Odjemalec: %s:%d | certifikat: %s ; geslo: %s\n", host, port, ime, geslo);
         secureRandom = new SecureRandom();
         secureRandom.nextInt();
@@ -98,7 +102,7 @@ public class Odjemalec {
 
     private void setupServerKeystore() throws GeneralSecurityException, IOException {
         serverKeyStore = KeyStore.getInstance("JKS");
-        serverKeyStore.load(new FileInputStream("server.public"), "public".toCharArray());
+        serverKeyStore.load(new FileInputStream("./certifikati/server.public"), "public".toCharArray());
     }
 
     private void setupClientKeyStore() throws GeneralSecurityException, IOException {
