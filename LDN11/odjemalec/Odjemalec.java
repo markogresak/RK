@@ -83,8 +83,7 @@ public class Odjemalec {
     private void setupServerKeystore() throws GeneralSecurityException,
             IOException {
         serverKeyStore = KeyStore.getInstance("JKS");
-        serverKeyStore.load(new FileInputStream("server.public"),
-                "public".toCharArray());
+        serverKeyStore.load(new FileInputStream("server.public"), "public".toCharArray());
     }
 
     private void setupClientKeyStore() throws GeneralSecurityException,
@@ -101,8 +100,7 @@ public class Odjemalec {
         kmf.init(clientKeyStore, geslo.toCharArray());
 
         sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
-                secureRandom);
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), secureRandom);
     }
 
     public void connect() {
