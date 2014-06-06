@@ -47,7 +47,7 @@ public class Streznik {
 
         if ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty()))
             System.out.println("Namig: privzeti certifikat je server.private, geslo je serverpwd");
-        Console console = null;
+        Console console;
         while ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty())) {
             try {
                 console = System.console();
@@ -78,7 +78,7 @@ public class Streznik {
                 }
             }
         }
-
+        System.out.printf("Streznik: %s:%d | certifikat: %s ; geslo: %s\n", host, port, ime, geslo);
         secureRandom = new SecureRandom();
         secureRandom.nextInt();
         new Streznik(host, port, ime, geslo).listen();
