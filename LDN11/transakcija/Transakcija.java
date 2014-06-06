@@ -204,4 +204,7 @@ public class Transakcija {
         writeToXMLFile(new File(pot));
     }
 
+    public void setStranka(String stranka) {
+        this._stranka = stranka;
+    }
 }
