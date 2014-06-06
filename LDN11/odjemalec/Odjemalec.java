@@ -31,7 +31,7 @@ public class Odjemalec {
     }
 
     public static void main(String[] args) {
-        String host = "localhost";
+        String host = "localhost", ime = null, geslo = null;
         int port = 12345;
         if (args.length > 0)
             host = args[0];
@@ -42,14 +42,20 @@ public class Odjemalec {
                 port = 12345;
             }
         }
+        if (args.length > 2)
+            ime = args[2];
+        if (args.length > 3)
+            geslo = args[3];
+
+        if((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty()))
+            System.out.println("Namig: privzeti certifikat je rk.private, geslo je rkpwd123");
         Console console = null;
-        String ime = null, geslo = null;
         while ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty())) {
             try {
                 console = System.console();
                 if (console != null) {
                     if (ime == null || ime.isEmpty()) {
-                        ime = console.readLine("Vnesite uporabnisko ime: ").trim();
+                        ime = console.readLine("Vnesite ime certifikata (ime.private): ").trim();
                     }
                     if (geslo == null || geslo.isEmpty()) {
                         char[] pwd = console.readPassword("Vnesite geslo: ");
@@ -61,7 +67,7 @@ public class Odjemalec {
             } catch (Exception ex) {
                 try {
                     if (ime == null || ime.isEmpty()) {
-                        System.out.print("Vnesite ime: ");
+                        System.out.print("Vnesite ime certifikata (ime.private): ");
                         ime = reader.readLine().trim();
                     }
                     if (geslo == null || geslo.isEmpty()) {
@@ -86,7 +92,7 @@ public class Odjemalec {
 
     private void setupClientKeyStore() throws GeneralSecurityException, IOException {
         clientKeyStore = KeyStore.getInstance("JKS");
-        clientKeyStore.load(new FileInputStream(ime + ".private"), geslo.toCharArray());
+        clientKeyStore.load(new FileInputStream(ime), geslo.toCharArray());
     }
 
     private void setupSSLContext() throws GeneralSecurityException, IOException {
