@@ -47,39 +47,43 @@ public class Streznik {
         if (args.length > 3)
             geslo = args[3];
 
-        if ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty()))
-            System.out.println("Namig: privzeti certifikat je server.private, geslo je serverpwd");
+        if ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty())) {
+            System.out.println("Namig: privzeti certifikat je ./certifikati/server.private, geslo je serverpwd");
+            System.out.println("       (za izbiro prizvetih nastavitev vnesite prazno pot in geslo)");
+        }
         Console console;
-        while ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty())) {
+        try {
+            console = System.console();
+            if (console != null) {
+                if (ime == null || ime.isEmpty()) {
+                    ime = console.readLine("Vnesite pot do certifikata: ").trim();
+                }
+                if (geslo == null || geslo.isEmpty()) {
+                    char[] pwd = console.readPassword("Vnesite geslo: ");
+                    geslo = new String(pwd).trim();
+                }
+            } else {
+                throw new NullPointerException("console");
+            }
+        } catch (Exception ex) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
             try {
-                console = System.console();
-                if (console != null) {
-                    if (ime == null || ime.isEmpty()) {
-                        ime = console.readLine("Vnesite ime certifikata: ").trim();
-                    }
-                    if (geslo == null || geslo.isEmpty()) {
-                        char[] pwd = console.readPassword("Vnesite geslo: ");
-                        geslo = new String(pwd).trim();
-                    }
-                } else {
-                    throw new NullPointerException("console");
+                if (ime == null || ime.isEmpty()) {
+                    System.out.print("Vnesite pot do certifikata: ");
+                    ime = reader.readLine().trim();
                 }
-            } catch (Exception ex) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-                try {
-                    if (ime == null || ime.isEmpty()) {
-                        System.out.print("Vnesite ime certifikata: ");
-                        ime = reader.readLine().trim();
-                    }
-                    if (geslo == null || geslo.isEmpty()) {
-                        System.out.print("Vnesite geslo: ");
-                        geslo = reader.readLine().trim();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (geslo == null || geslo.isEmpty()) {
+                    System.out.print("Vnesite geslo: ");
+                    geslo = reader.readLine().trim();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+        if ((ime == null || ime.isEmpty()))
+            ime = "./certifikati/server.private";
+        if (geslo == null || geslo.isEmpty())
+            geslo = "serverpwd";
         System.out.printf("Streznik: %s:%d | certifikat: %s ; geslo: %s\n", host, port, ime, geslo);
         secureRandom = new SecureRandom();
         secureRandom.nextInt();
@@ -88,7 +92,7 @@ public class Streznik {
 
     private void setupClientKeyStore() throws GeneralSecurityException, IOException {
         clientKeyStore = KeyStore.getInstance("JKS");
-        clientKeyStore.load(new FileInputStream("client.public"), "public".toCharArray());
+        clientKeyStore.load(new FileInputStream("./certifikati/client.public"), "public".toCharArray());
     }
 
     private void setupServerKeystore() throws GeneralSecurityException, IOException {
