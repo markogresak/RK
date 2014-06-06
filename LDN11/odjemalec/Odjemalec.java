@@ -4,18 +4,31 @@ import transakcija.Artikel;
 import transakcija.TipTransakcije;
 import transakcija.Transakcija;
 
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.SecureRandom;
 
 public class Odjemalec {
     private static final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    private static SecureRandom secureRandom;
     private final String host;
     private final int port;
+    private final String ime;
+    private final String geslo;
+    private KeyStore clientKeyStore;
+    private KeyStore serverKeyStore;
+    private SSLContext sslContext;
 
-    public Odjemalec(String host, int port) {
+
+    public Odjemalec(String host, int port, String ime, String geslo) {
         this.host = host;
         this.port = port;
+        this.ime = ime;
+        this.geslo = geslo;
     }
 
     public static void main(String[] args) {
@@ -30,20 +43,90 @@ public class Odjemalec {
                 port = 12345;
             }
         }
+        Console console = null;
+        String ime = null, geslo = null;
+        while ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty())) {
+            try {
+                console = System.console();
+                if (console != null) {
+                    if (ime == null || ime.isEmpty()) {
+                        ime = console.readLine("Vnesite ime: ").trim();
+                    }
+                    if (geslo == null || geslo.isEmpty()) {
+                        char[] pwd = console.readPassword("Vnesite geslo: ");
+                        geslo = new String(pwd).trim();
+                    }
+                }
+                else
+                    throw new NullPointerException("console");
+            } catch (Exception ex) {
+                try {
+                    if (ime == null || ime.isEmpty()) {
+                        System.out.print("Vnesite ime: ");
+                        ime = reader.readLine().trim();
+                    }
+                    if (geslo == null || geslo.isEmpty()) {
+                        System.out.print("Vnesite geslo: ");
+                        geslo = reader.readLine().trim();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        secureRandom = new SecureRandom();
+        secureRandom.nextInt();
         while (true)
-            new Odjemalec(host, port).connect();
+            new Odjemalec(host, port, ime, geslo).connect();
+    }
+
+    private void setupServerKeystore() throws GeneralSecurityException,
+            IOException {
+        serverKeyStore = KeyStore.getInstance("JKS");
+        serverKeyStore.load(new FileInputStream("server.public"),
+                "public".toCharArray());
+    }
+
+    private void setupClientKeyStore() throws GeneralSecurityException,
+            IOException {
+        clientKeyStore = KeyStore.getInstance("JKS");
+        clientKeyStore.load(new FileInputStream(ime + ".private"), geslo.toCharArray());
+    }
+
+    private void setupSSLContext() throws GeneralSecurityException, IOException {
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+        tmf.init(serverKeyStore);
+
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+        kmf.init(clientKeyStore, geslo.toCharArray());
+
+        sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(),
+                secureRandom);
     }
 
     public void connect() {
         try {
-            Socket client = new Socket(host, port);
-            handleConnection(client);
+            setupServerKeystore();
+            setupClientKeyStore();
+            setupSSLContext();
+
+            SSLSocketFactory sf = sslContext.getSocketFactory();
+            SSLSocket socket = (SSLSocket) sf.createSocket(host, port);
+
+            socket.setEnabledCipherSuites(new String[]{"TLS_RSA_WITH_AES_128_CBC_SHA"});
+
+            socket.startHandshake();
+            handleConnection(socket);
         } catch (UnknownHostException uhe) {
             System.out.println("Unknown host: " + host);
             uhe.printStackTrace();
         } catch (IOException ioe) {
             System.out.println("IOException: " + ioe);
             ioe.printStackTrace();
+        } catch (GeneralSecurityException e) {
+            System.out.println("GeneralSecurityException: " + e);
+            e.printStackTrace();
         }
     }
 
@@ -73,13 +156,13 @@ public class Odjemalec {
                 System.exit(0);
         } while ((tip = TipTransakcije.getByName(tipString)) == null);
 
-        String stranka = null;
-        do {
-            if (stranka != null)
-                System.out.println("Vneseno ime ne sme biti prazen niz! Poizkusite znova.");
-            System.out.print("Vnesite vaše ime: ");
-            stranka = reader.readLine().trim();
-        } while (stranka.length() == 0);
+//        String stranka = null;
+//        do {
+//            if (stranka != null)
+//                System.out.println("Vneseno ime ne sme biti prazen niz! Poizkusite znova.");
+//            System.out.print("Vnesite vaše ime: ");
+//            stranka = reader.readLine().trim();
+//        } while (stranka.length() == 0);
 
         if (tip != TipTransakcije.Inventura) {
             String artikel = null;
@@ -126,10 +209,10 @@ public class Odjemalec {
                 }
                 iprvic = false;
             } while (idSkladisca <= 0);
-            return new Transakcija(tip, stranka, new Artikel[]{new Artikel(
+            return new Transakcija(tip, this.ime, new Artikel[]{new Artikel(
                     artikel, kolicina, idSkladisca)}).getXMLDocumentString();
         } else
-            return new Transakcija(tip, stranka,
+            return new Transakcija(tip, this.ime,
                     new Artikel[]{Artikel.empty()}).getXMLDocumentString();
     }
 }
