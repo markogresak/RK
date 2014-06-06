@@ -7,7 +7,6 @@ import transakcija.Transakcija;
 import javax.net.ssl.*;
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -47,15 +46,15 @@ public class Odjemalec {
         if (args.length > 3)
             geslo = args[3];
 
-        if((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty()))
-            System.out.println("Namig: privzeti certifikat je rk.private, geslo je rkpwd123");
-        Console console = null;
+        if ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty()))
+            System.out.println("Namig: privzeti certifikat je rk.private, geslo je rkpwd1");
+        Console console;
         while ((ime == null || ime.isEmpty()) || (geslo == null || geslo.isEmpty())) {
             try {
                 console = System.console();
                 if (console != null) {
                     if (ime == null || ime.isEmpty()) {
-                        ime = console.readLine("Vnesite ime certifikata (ime.private): ").trim();
+                        ime = console.readLine("Vnesite ime certifikata: ").trim();
                     }
                     if (geslo == null || geslo.isEmpty()) {
                         char[] pwd = console.readPassword("Vnesite geslo: ");
@@ -67,7 +66,7 @@ public class Odjemalec {
             } catch (Exception ex) {
                 try {
                     if (ime == null || ime.isEmpty()) {
-                        System.out.print("Vnesite ime certifikata (ime.private): ");
+                        System.out.print("Vnesite ime certifikata: ");
                         ime = reader.readLine().trim();
                     }
                     if (geslo == null || geslo.isEmpty()) {
@@ -79,10 +78,22 @@ public class Odjemalec {
                 }
             }
         }
+        System.out.printf("Odjemalec: %s:%d | certifikat: %s ; geslo: %s\n", host, port, ime, geslo);
         secureRandom = new SecureRandom();
         secureRandom.nextInt();
-        while (true)
-            new Odjemalec(host, port, ime, geslo).connect();
+        while (true) {
+            try {
+                new Odjemalec(host, port, ime, geslo).connect();
+            } catch (IOException ioe) {
+                System.out.println("IOException: " + ioe);
+                ioe.printStackTrace();
+                System.exit(1);
+            } catch (GeneralSecurityException e) {
+                System.out.println("GeneralSecurityException: " + e);
+                e.printStackTrace();
+                System.exit(1);
+            }
+        }
     }
 
     private void setupServerKeystore() throws GeneralSecurityException, IOException {
@@ -106,35 +117,40 @@ public class Odjemalec {
         sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), secureRandom);
     }
 
-    public void connect() {
-        try {
-            setupServerKeystore();
-            setupClientKeyStore();
-            setupSSLContext();
+    public void connect() throws GeneralSecurityException, IOException {
+//        try {
+        setupServerKeystore();
+        setupClientKeyStore();
+        setupSSLContext();
 
-            SSLSocketFactory sf = sslContext.getSocketFactory();
-            SSLSocket socket = (SSLSocket) sf.createSocket(host, port);
+        SSLSocketFactory sf = sslContext.getSocketFactory();
+        SSLSocket socket = (SSLSocket) sf.createSocket(host, port);
 
-            socket.setEnabledCipherSuites(new String[]{"TLS_RSA_WITH_AES_128_CBC_SHA"});
+        socket.setEnabledCipherSuites(new String[]{"TLS_RSA_WITH_AES_128_CBC_SHA"});
 
-            socket.startHandshake();
-            handleConnection(socket);
-        } catch (UnknownHostException uhe) {
-            System.out.println("Unknown host: " + host);
-            uhe.printStackTrace();
-        } catch (IOException ioe) {
-            System.out.println("IOException: " + ioe);
-            ioe.printStackTrace();
-        } catch (GeneralSecurityException e) {
-            System.out.println("GeneralSecurityException: " + e);
-            e.printStackTrace();
-        }
+        socket.startHandshake();
+        handleConnection(socket);
+//        } catch (UnknownHostException uhe) {
+//            System.out.println("Unknown host: " + host);
+//            uhe.printStackTrace();
+//        } catch (IOException ioe) {
+//            System.out.println("IOException: " + ioe);
+//            ioe.printStackTrace();
+//        } catch (GeneralSecurityException e) {
+//            System.out.println("GeneralSecurityException: " + e);
+//            e.printStackTrace();
+//        }
     }
 
     protected void handleConnection(Socket client) throws IOException {
         DataOutputStream out = new DataOutputStream(client.getOutputStream());
+        String stranka = ((SSLSocket) client).getSession().getPeerPrincipal().getName();
+        int cnIndex = stranka.indexOf("CN=");
+        if (cnIndex >= 0)
+            stranka = stranka.substring(cnIndex + 3);
+//        System.out.println(stranka);
 
-        out.writeUTF(preberiPodatke());
+        out.writeUTF(preberiPodatke(stranka));
         try {
             Transakcija tOdgovor = new Transakcija(new DataInputStream(client.getInputStream()));
             System.out.printf("Odgovor strežnika:%n%s%n", tOdgovor.getOdgovor().trim().equals("") ?
@@ -145,7 +161,7 @@ public class Odjemalec {
         client.close();
     }
 
-    private String preberiPodatke() throws IOException {
+    private String preberiPodatke(String stranka) throws IOException {
         String tipString = null;
         TipTransakcije tip;
         do {
@@ -210,10 +226,10 @@ public class Odjemalec {
                 }
                 iprvic = false;
             } while (idSkladisca <= 0);
-            return new Transakcija(tip, this.ime, new Artikel[]{new Artikel(
+            return new Transakcija(tip, stranka, new Artikel[]{new Artikel(
                     artikel, kolicina, idSkladisca)}).getXMLDocumentString();
         } else
-            return new Transakcija(tip, this.ime,
+            return new Transakcija(tip, stranka,
                     new Artikel[]{Artikel.empty()}).getXMLDocumentString();
     }
 }
