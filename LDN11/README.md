@@ -1,4 +1,4 @@
-LDN7: Programiranje vtičev (Java/Python, odjemalec-strežnik)
+LDN11: SSL/TLS
 --------
 
 Skladiščni program, ki zna brati in shranjevati XML datoteke ter generirati odgovore na 3 različne tipe datotek:
@@ -21,3 +21,15 @@ Dodana komunikacija med odjemalcem in strežnikom, komunikacija poteka preko XML
 ### Strežnik: ###
 * streznik/Streznik.java: procesira zahteve odjemalca
 * streznik/StanjeSkladisca.java: shranjuje stanje zalog v skladiščih
+
+### Zaščitena povezava (SSL/TLS): ###
+Uporaba public/private parov v datoteki *certifikati*
+* server.public: javni ključ strežnika
+* server.private: zasebni ključ strežnika
+* client.public: javni ključ, ki je skupen vsem uporabnikom
+* rk.private: zasebni ključ rdeče kapice
+* babica.private: zasebni ključ babice
+
+### Skripte: ###
+* ./certifikati/generatekeys.sh: generira public/private pare za zaščiteno povezavo med odjemalcem in strežnikom
+* ./certifikati/generatekeys.bat: enako kot *generatekeys.sh*, le da deluje na Windows operacijskem sistemu
